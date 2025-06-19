@@ -1,0 +1,10 @@
+bin/
+compose.yaml
+docker-compose.yaml
+Dockerfile
+.gitignore
+.git
+.github/
+*.test
+*.out
+README.md

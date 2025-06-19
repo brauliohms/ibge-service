@@ -1,0 +1,158 @@
+basePath: /api/v1
+definitions:
+  domain.Cidade:
+    properties:
+      codigo_ibge:
+        type: integer
+      codigo_tom:
+        type: string
+      estado_codigo_ibge:
+        type: integer
+      estado_nome:
+        type: string
+      estado_sigla:
+        type: string
+      micro_regiao:
+        type: string
+      nome:
+        type: string
+      regiao_imediata:
+        type: string
+    type: object
+  domain.Estado:
+    properties:
+      codigo_ibge:
+        type: integer
+      nome:
+        type: string
+      sigla:
+        type: string
+    type: object
+info:
+  contact:
+    email: contato@integradocs.com.br
+    name: API IBGE Support
+    url: http://www.exemplo.com/support
+  description: Este é um microserviço para consulta de estados e cidades do Brasil,
+    baseado nos dados do IBGE.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: API de Dados do IBGE
+  version: "1.0"
+paths:
+  /cidades/{codigo_ibge}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma cidade específica pelo seu código IBGE
+      parameters:
+      - description: Código IBGE da cidade
+        example: "3550308"
+        in: path
+        name: codigo_ibge
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Cidade'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca cidade por código IBGE
+      tags:
+      - Cidades
+  /estados:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um array com todos os 27 estados brasileiros
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de estados retornada com sucesso
+          schema:
+            items:
+              $ref: '#/definitions/domain.Estado'
+            type: array
+        "500":
+          description: Erro interno do servidor
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lista todos os estados
+      tags:
+      - Estados
+  /estados/{uf}:
+    get:
+      consumes:
+      - application/json
+      description: Retorna os dados completos de um único estado
+      parameters:
+      - description: 'Sigla do Estado (ex: SP, RJ, BA)'
+        in: path
+        name: uf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dados do estado retornados com sucesso
+          schema:
+            $ref: '#/definitions/domain.Estado'
+        "404":
+          description: Estado não encontrado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca um estado pela sua sigla (UF)
+      tags:
+      - Estados
+  /estados/{uf}/cidades:
+    get:
+      consumes:
+      - application/json
+      description: Retorna um array com todas as cidades pertencentes a um determinado
+        estado (UF)
+      parameters:
+      - description: 'Sigla do Estado (ex: SP, RJ, BA)'
+        in: path
+        name: uf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lista de cidades retornada com sucesso
+          schema:
+            items:
+              $ref: '#/definitions/domain.Cidade'
+            type: array
+        "404":
+          description: Estado não encontrado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca todas as cidades de um estado
+      tags:
+      - Cidades
+swagger: "2.0"

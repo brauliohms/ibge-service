@@ -1,0 +1,236 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Este é um microserviço para consulta de estados e cidades do Brasil, baseado nos dados do IBGE.",
+        "title": "API de Dados do IBGE",
+        "contact": {
+            "name": "API IBGE Support",
+            "url": "http://www.exemplo.com/support",
+            "email": "contato@integradocs.com.br"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/cidades/{codigo_ibge}": {
+            "get": {
+                "description": "Retorna uma cidade específica pelo seu código IBGE",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cidades"
+                ],
+                "summary": "Busca cidade por código IBGE",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "3550308",
+                        "description": "Código IBGE da cidade",
+                        "name": "codigo_ibge",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Cidade"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/estados": {
+            "get": {
+                "description": "Retorna um array com todos os 27 estados brasileiros",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Estados"
+                ],
+                "summary": "Lista todos os estados",
+                "responses": {
+                    "200": {
+                        "description": "Lista de estados retornada com sucesso",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Estado"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/estados/{uf}": {
+            "get": {
+                "description": "Retorna os dados completos de um único estado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Estados"
+                ],
+                "summary": "Busca um estado pela sua sigla (UF)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sigla do Estado (ex: SP, RJ, BA)",
+                        "name": "uf",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dados do estado retornados com sucesso",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Estado"
+                        }
+                    },
+                    "404": {
+                        "description": "Estado não encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/estados/{uf}/cidades": {
+            "get": {
+                "description": "Retorna um array com todas as cidades pertencentes a um determinado estado (UF)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cidades"
+                ],
+                "summary": "Busca todas as cidades de um estado",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sigla do Estado (ex: SP, RJ, BA)",
+                        "name": "uf",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de cidades retornada com sucesso",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Cidade"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Estado não encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.Cidade": {
+            "type": "object",
+            "properties": {
+                "codigo_ibge": {
+                    "type": "integer"
+                },
+                "codigo_tom": {
+                    "type": "string"
+                },
+                "estado_codigo_ibge": {
+                    "type": "integer"
+                },
+                "estado_nome": {
+                    "type": "string"
+                },
+                "estado_sigla": {
+                    "type": "string"
+                },
+                "micro_regiao": {
+                    "type": "string"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "regiao_imediata": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Estado": {
+            "type": "object",
+            "properties": {
+                "codigo_ibge": {
+                    "type": "integer"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "sigla": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
