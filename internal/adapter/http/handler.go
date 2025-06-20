@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,7 +32,7 @@ func NewIBGEHandler(uc *usecase.IBGEUseCase) *IBGEHandler {
 func (h *IBGEHandler) GetAllEstados(w http.ResponseWriter, r *http.Request) {
 	estados, err := h.useCase.GetAllEstados()
 	if err != nil {
-		http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
+		respondWithError(w, http.StatusInternalServerError, "Erro interno do servidor")
 		return
 	}
 	respondWithJSON(w, http.StatusOK, estados)
@@ -60,7 +61,7 @@ func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
 		estado, err = h.useCase.GetEstadoByUF(strings.ToUpper(ufOuCodigo))
 	}
 	if err != nil {
-		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
 	respondWithJSON(w, http.StatusOK, estado)
@@ -89,7 +90,7 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 		cidades, err = h.useCase.GetCidadesByEstadoUF(strings.ToUpper(ufOuCodigo))
 	}
 	if err != nil {
-		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
 	respondWithJSON(w, http.StatusOK, cidades)
@@ -108,12 +109,12 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 // @Router /cidades/{codigo_ibge} [get]
 func (h *IBGEHandler) GetCidadeByCodigo(w http.ResponseWriter, r *http.Request) {
 	codigo_ibge := chi.URLParam(r, "codigo_ibge")
-	estado, err := h.useCase.GetCidadeByCodigo(codigo_ibge)
+	cidade, err := h.useCase.GetCidadeByCodigo(codigo_ibge)
 	if err != nil {
-		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
-	respondWithJSON(w, http.StatusOK, estado)
+	respondWithJSON(w, http.StatusOK, cidade)
 }
 
 // GetCidadeByCodigoTOM godoc
@@ -129,18 +130,45 @@ func (h *IBGEHandler) GetCidadeByCodigo(w http.ResponseWriter, r *http.Request) 
 // @Router /cidades/{codigo_tom}/tom [get]
 func (h *IBGEHandler) GetCidadeByCodigoTOM(w http.ResponseWriter, r *http.Request) {
 	codigo_tom := chi.URLParam(r, "codigo_tom")
-	estado, err := h.useCase.GetCidadeByCodigoTOM(codigo_tom)
+	cidade, err := h.useCase.GetCidadeByCodigoTOM(codigo_tom)
 	if err != nil {
-		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
-	respondWithJSON(w, http.StatusOK, estado)
+	respondWithJSON(w, http.StatusOK, cidade)
 }
 
 // respondWithJSON é uma função helper para padronizar as respostas JSON.
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
+	response, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("Erro ao fazer marshal do JSON: %v", err)
+		respondWithError(w, http.StatusInternalServerError, "Erro interno do servidor")
+		return
+	}
+	
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	
+	if _, err := w.Write(response); err != nil {
+		log.Printf("Erro ao escrever resposta HTTP: %v", err)
+	}
+}
+
+// respondWithError é uma função helper para padronizar as respostas de erro.
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	errorResponse := map[string]string{"error": message}
+	response, err := json.Marshal(errorResponse)
+	if err != nil {
+		log.Printf("Erro ao fazer marshal do erro: %v", err)
+		http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	
+	if _, err := w.Write(response); err != nil {
+		log.Printf("Erro ao escrever resposta de erro HTTP: %v", err)
+	}
 }
