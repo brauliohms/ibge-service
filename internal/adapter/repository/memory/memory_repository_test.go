@@ -36,9 +36,9 @@ func TestMemoryRepository(t *testing.T) {
 	t.Run("deve encontrar um estado pela UF", func(t *testing.T) {
 		uf := "EA"
 		expected := &domain.Estado{CodigoIBGE: 1, Nome: "Estado A", Sigla: "EA"}
-		
+
 		got, err := repo.FindEstadoByUF(uf)
-		
+
 		if err != nil {
 			t.Errorf("Esperava não ter erro, mas recebi: %v", err)
 		}
@@ -49,9 +49,9 @@ func TestMemoryRepository(t *testing.T) {
 
 	t.Run("deve retornar erro para UF inexistente", func(t *testing.T) {
 		uf := "XX"
-		
+
 		_, err := repo.FindEstadoByUF(uf)
-		
+
 		if err == nil {
 			t.Errorf("Esperava um erro para UF inexistente, mas não recebi nenhum.")
 		}
@@ -63,7 +63,7 @@ func TestMemoryRepository(t *testing.T) {
 			{CodigoIBGE: 201, Nome: "Cidade B1"},
 			{CodigoIBGE: 202, Nome: "Cidade B2"},
 		}
-		
+
 		got, err := repo.FindCidadesByEstadoUF(uf)
 
 		if err != nil {

@@ -6,6 +6,12 @@ swagger:
 build:
 	go build -o ./bin/ibge-service ./cmd/ibge-api
 
+format:
+# Verificar formatação
+	gofmt -s -l .
+# Corrigir formatação
+	go fmt ./...
+
 run:
 	go run ./cmd/ibge-api/main.go
 
@@ -14,6 +20,10 @@ test:
 
 test-coverage:
 	go test --coverprofile=coverage.out ./...
+
+verify:
+	go mod verify
+	go mod tidy
 
 docker-build:
 	docker build -t ibge:latest .

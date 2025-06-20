@@ -29,7 +29,7 @@ import (
 
 func main() {
 	// Otimizar para alta concorrência
-    runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	// 1. Carregar configurações
 	cfg := config.Load()
 	log.Println("Configurações carregadas")
@@ -41,10 +41,10 @@ func main() {
 	// 	log.Fatalf("Falha ao conectar com o PostgreSQL: %v", err)
 	// }
 	// log.Println("Conexão com PostgreSQL estabelecida")
-	
-	ibgeRepo, err := sqlite.NewSQLiteRepository("./data/ibge.db")
+
+	ibgeRepo, err := sqlite.NewSQLiteRepository(cfg.SqliteDSN)
 	if err != nil {
-    log.Fatalf("Falha ao conectar com o SQLite: %v", err)
+		log.Fatalf("Falha ao conectar com o SQLite: %v", err)
 	}
 
 	// 3. Inicializar o repositório em memória, usando o PostgreSQL como fonte.
@@ -65,13 +65,13 @@ func main() {
 
 	// 6. Configurar o roteador.
 	router := httphandler.SetupRouter(ibgeHandler)
-	
+
 	docs.SwaggerInfo.Title = "API de Dados do IBGE"
 	docs.SwaggerInfo.Description = "Microserviço para consulta de estados e cidades do Brasil."
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = fmt.Sprintf("localhost:%s", cfg.ServerPort)
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	docs.SwaggerInfo.Schemes = []string{"http", "https" }
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// 7. Iniciar o servidor HTTP.
 	serverAddr := fmt.Sprintf(":%s", cfg.ServerPort)

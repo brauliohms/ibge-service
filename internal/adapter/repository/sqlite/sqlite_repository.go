@@ -81,12 +81,12 @@ func (r *SQLiteRepository) FindAllCidades() ([]domain.Cidade, map[string][]domai
 		var c domain.Cidade
 		// var estadoSigla string
 		// Usamos sql.NullString para campos que podem ser nulos, como codigo_tom.
-		var codigoTom sql.NullString 
+		var codigoTom sql.NullString
 
 		if err := rows.Scan(&c.CodigoIBGE, &c.Nome, &codigoTom, &c.MicroRegiao, &c.RegiaoImediata, &c.EstadoSigla, &c.EstadoNome, &c.EstadoCodigoIBGE); err != nil {
 			return nil, nil, err
 		}
-		
+
 		if codigoTom.Valid {
 			c.CodigoTOM = codigoTom.String
 		}

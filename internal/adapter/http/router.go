@@ -12,19 +12,19 @@ import (
 
 func SetupRouter(handler *IBGEHandler) http.Handler {
 	r := chi.NewRouter()
-	
+
 	// Middlewares para produção
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	
+
 	// Timeout para requisições
 	r.Use(middleware.Timeout(30 * time.Second))
-	
+
 	// Compressão para reduzir bandwidth
 	r.Use(middleware.Compress(5))
-	
+
 	// Headers de segurança
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +49,7 @@ func SetupRouter(handler *IBGEHandler) http.Handler {
 		r.Get("/estados/{uf}", handler.GetEstadoByUF)
 		r.Get("/estados/{uf}/cidades", handler.GetCidadesByEstadoUF)
 		r.Get("/cidades/{codigo_ibge}", handler.GetCidadeByCodigo)
+		r.Get("/cidades/{codigo_tom}/tom", handler.GetCidadeByCodigoTOM)
 		r.Get("/docs/*", httpSwagger.WrapHandler)
 	})
 

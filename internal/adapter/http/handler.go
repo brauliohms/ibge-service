@@ -3,8 +3,10 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
+	"github.com/brauliohms/ibge-service/internal/domain"
 	"github.com/brauliohms/ibge-service/internal/usecase"
 	"github.com/go-chi/chi/v5"
 )
@@ -41,13 +43,22 @@ func (h *IBGEHandler) GetAllEstados(w http.ResponseWriter, r *http.Request) {
 // @Tags         Estados
 // @Accept       json
 // @Produce      json
-// @Param        uf   path      string  true  "Sigla do Estado (ex: SP, RJ, BA)"
+// @Param        uf   path      string  true  "Sigla do Estado (ex: SP, RJ, BA) ou Código IBGE do Estado (ex: 35, 33, 29)"
 // @Success      200  {object}  domain.Estado "Dados do estado retornados com sucesso"
 // @Failure      404  {object}  map[string]string "Estado não encontrado"
 // @Router       /estados/{uf} [get]
 func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
-	uf := chi.URLParam(r, "uf")
-	estado, err := h.useCase.GetEstadoByUF(uf)
+	ufOuCodigo := chi.URLParam(r, "uf")
+	var estado *domain.Estado
+	var err error
+	// Verifica se é um número (código IBGE) ou string (sigla)
+	if _, parseErr := strconv.Atoi(ufOuCodigo); parseErr == nil {
+		// É um número, busca por código IBGE
+		estado, err = h.useCase.GetEstadoByCodigoIbge(ufOuCodigo)
+	} else {
+		// É uma string, busca por sigla
+		estado, err = h.useCase.GetEstadoByUF(strings.ToUpper(ufOuCodigo))
+	}
 	if err != nil {
 		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
 		return
@@ -61,13 +72,22 @@ func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
 // @Tags         Cidades
 // @Accept       json
 // @Produce      json
-// @Param        uf   path      string  true  "Sigla do Estado (ex: SP, RJ, BA)"
+// @Param        uf   path      string  true  "Sigla do Estado (ex: SP, RJ, BA) ou Código IBGE do Estado (ex: 35, 33, 29)"
 // @Success      200  {array}   domain.Cidade "Lista de cidades retornada com sucesso"
 // @Failure      404  {object}  map[string]string "Estado não encontrado"
 // @Router       /estados/{uf}/cidades [get]
 func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Request) {
-	uf := chi.URLParam(r, "uf")
-	cidades, err := h.useCase.GetCidadesByEstadoUF(strings.ToUpper(uf))
+	ufOuCodigo := chi.URLParam(r, "uf")
+	var cidades []domain.Cidade
+	var err error
+	// Verifica se é um número (código IBGE) ou string (sigla)
+	if _, parseErr := strconv.Atoi(ufOuCodigo); parseErr == nil {
+		// É um número, busca por código IBGE
+		cidades, err = h.useCase.GetCidadesByEstadoCodigoIbge(ufOuCodigo)
+	} else {
+		// É uma string, busca por sigla
+		cidades, err = h.useCase.GetCidadesByEstadoUF(strings.ToUpper(ufOuCodigo))
+	}
 	if err != nil {
 		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
 		return
@@ -89,6 +109,27 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 func (h *IBGEHandler) GetCidadeByCodigo(w http.ResponseWriter, r *http.Request) {
 	codigo_ibge := chi.URLParam(r, "codigo_ibge")
 	estado, err := h.useCase.GetCidadeByCodigo(codigo_ibge)
+	if err != nil {
+		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
+		return
+	}
+	respondWithJSON(w, http.StatusOK, estado)
+}
+
+// GetCidadeByCodigoTOM godoc
+// @Summary Busca cidade por código TOM
+// @Description Retorna uma cidade específica pelo seu código TOM
+// @Tags Cidades
+// @Accept json
+// @Produce json
+// @Param codigo_tom path string true "Código TOM da cidade" example(7107)
+// @Success 200 {object} domain.Cidade
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /cidades/{codigo_tom}/tom [get]
+func (h *IBGEHandler) GetCidadeByCodigoTOM(w http.ResponseWriter, r *http.Request) {
+	codigo_tom := chi.URLParam(r, "codigo_tom")
+	estado, err := h.useCase.GetCidadeByCodigoTOM(codigo_tom)
 	if err != nil {
 		respondWithJSON(w, http.StatusNotFound, map[string]string{"error": err.Error()})
 		return

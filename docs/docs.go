@@ -74,6 +74,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/cidades/{codigo_tom}/tom": {
+            "get": {
+                "description": "Retorna uma cidade específica pelo seu código TOM",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cidades"
+                ],
+                "summary": "Busca cidade por código TOM",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "7107",
+                        "description": "Código TOM da cidade",
+                        "name": "codigo_tom",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Cidade"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/estados": {
             "get": {
                 "description": "Retorna um array com todos os 27 estados brasileiros",
@@ -125,7 +176,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Sigla do Estado (ex: SP, RJ, BA)",
+                        "description": "Sigla do Estado (ex: SP, RJ, BA) ou Código IBGE do Estado (ex: 35, 33, 29)",
                         "name": "uf",
                         "in": "path",
                         "required": true
@@ -166,7 +217,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Sigla do Estado (ex: SP, RJ, BA)",
+                        "description": "Sigla do Estado (ex: SP, RJ, BA) ou Código IBGE do Estado (ex: 35, 33, 29)",
                         "name": "uf",
                         "in": "path",
                         "required": true

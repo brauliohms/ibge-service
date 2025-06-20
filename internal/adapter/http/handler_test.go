@@ -37,26 +37,99 @@ func (m *mockIBGERepository) FindEstadoByUF(uf string) (*domain.Estado, error) {
 	}
 }
 
+func (m *mockIBGERepository) FindEstadoByCodigoIbge(codigo_ibge string) (*domain.Estado, error) {
+	switch codigo_ibge {
+	case "35":
+		return &domain.Estado{CodigoIBGE: 35, Sigla: "SP", Nome: "São Paulo"}, nil
+	case "33":
+		return &domain.Estado{CodigoIBGE: 33, Sigla: "RJ", Nome: "Rio de Janeiro"}, nil
+	case "31":
+		return &domain.Estado{CodigoIBGE: 31, Sigla: "MG", Nome: "Minas Gerais"}, nil
+	default:
+		return nil, fmt.Errorf("estado com o código ibge %s não encontrado", codigo_ibge)
+	}
+}
+
 func (m *mockIBGERepository) FindCidadesByEstadoUF(uf string) ([]domain.Cidade, error) {
 	uf = strings.ToUpper(uf)
 	switch uf {
 	case "SP":
 		return []domain.Cidade{
-			{CodigoIBGE: 3550308, Nome: "São Paulo", EstadoCodigoIBGE: 35},
-			{CodigoIBGE: 3509502, Nome: "Campinas", EstadoCodigoIBGE: 35},
-			{CodigoIBGE: 3552205, Nome: "Santos", EstadoCodigoIBGE: 35},
+			{CodigoIBGE: 3550308, Nome: "São Paulo", EstadoCodigoIBGE: 35, CodigoTOM: "7107"},
+			{CodigoIBGE: 3509502, Nome: "Campinas", EstadoCodigoIBGE: 35, CodigoTOM: "7108"},
+			{CodigoIBGE: 3552205, Nome: "Santos", EstadoCodigoIBGE: 35, CodigoTOM: "7109"},
 		}, nil
 	case "RJ":
 		return []domain.Cidade{
-			{CodigoIBGE: 3304557, Nome: "Rio de Janeiro", EstadoCodigoIBGE: 33},
-			{CodigoIBGE: 3301702, Nome: "Niterói", EstadoCodigoIBGE: 33},
+			{CodigoIBGE: 3304557, Nome: "Rio de Janeiro", EstadoCodigoIBGE: 33, CodigoTOM: "7201"},
+			{CodigoIBGE: 3301702, Nome: "Niterói", EstadoCodigoIBGE: 33, CodigoTOM: "7202"},
 		}, nil
 	case "MG":
 		return []domain.Cidade{
-			{CodigoIBGE: 3106200, Nome: "Belo Horizonte", EstadoCodigoIBGE: 31},
+			{CodigoIBGE: 3106200, Nome: "Belo Horizonte", EstadoCodigoIBGE: 31, CodigoTOM: "7301"},
 		}, nil
 	default:
 		return nil, fmt.Errorf("estado com a sigla %s não encontrado", uf)
+	}
+}
+
+func (m *mockIBGERepository) FindCidadesByEstadoCodigoIbge(codigo_ibge string) ([]domain.Cidade, error) {
+	switch codigo_ibge {
+	case "35":
+		return []domain.Cidade{
+			{CodigoIBGE: 3550308, Nome: "São Paulo", EstadoCodigoIBGE: 35, CodigoTOM: "7107"},
+			{CodigoIBGE: 3509502, Nome: "Campinas", EstadoCodigoIBGE: 35, CodigoTOM: "7108"},
+			{CodigoIBGE: 3552205, Nome: "Santos", EstadoCodigoIBGE: 35, CodigoTOM: "7109"},
+		}, nil
+	case "33":
+		return []domain.Cidade{
+			{CodigoIBGE: 3304557, Nome: "Rio de Janeiro", EstadoCodigoIBGE: 33, CodigoTOM: "7201"},
+			{CodigoIBGE: 3301702, Nome: "Niterói", EstadoCodigoIBGE: 33, CodigoTOM: "7202"},
+		}, nil
+	case "31":
+		return []domain.Cidade{
+			{CodigoIBGE: 3106200, Nome: "Belo Horizonte", EstadoCodigoIBGE: 31, CodigoTOM: "7301"},
+		}, nil
+	default:
+		return nil, fmt.Errorf("estado com o código ibge %s não encontrado", codigo_ibge)
+	}
+}
+
+func (m *mockIBGERepository) FindCidadeByCodigo(codigo string) (*domain.Cidade, error) {
+	switch codigo {
+	case "3550308":
+		return &domain.Cidade{CodigoIBGE: 3550308, Nome: "São Paulo", EstadoCodigoIBGE: 35, CodigoTOM: "7107"}, nil
+	case "3509502":
+		return &domain.Cidade{CodigoIBGE: 3509502, Nome: "Campinas", EstadoCodigoIBGE: 35, CodigoTOM: "7108"}, nil
+	case "3552205":
+		return &domain.Cidade{CodigoIBGE: 3552205, Nome: "Santos", EstadoCodigoIBGE: 35, CodigoTOM: "7109"}, nil
+	case "3304557":
+		return &domain.Cidade{CodigoIBGE: 3304557, Nome: "Rio de Janeiro", EstadoCodigoIBGE: 33, CodigoTOM: "7201"}, nil
+	case "3301702":
+		return &domain.Cidade{CodigoIBGE: 3301702, Nome: "Niterói", EstadoCodigoIBGE: 33, CodigoTOM: "7202"}, nil
+	case "3106200":
+		return &domain.Cidade{CodigoIBGE: 3106200, Nome: "Belo Horizonte", EstadoCodigoIBGE: 31, CodigoTOM: "7301"}, nil
+	default:
+		return nil, fmt.Errorf("cidade com código %s não encontrada", codigo)
+	}
+}
+
+func (m *mockIBGERepository) FindCidadeByCodigoTOM(codigo_tom string) (*domain.Cidade, error) {
+	switch codigo_tom {
+	case "7107":
+		return &domain.Cidade{CodigoIBGE: 3550308, Nome: "São Paulo", EstadoCodigoIBGE: 35, CodigoTOM: "7107"}, nil
+	case "7108":
+		return &domain.Cidade{CodigoIBGE: 3509502, Nome: "Campinas", EstadoCodigoIBGE: 35, CodigoTOM: "7108"}, nil
+	case "7109":
+		return &domain.Cidade{CodigoIBGE: 3552205, Nome: "Santos", EstadoCodigoIBGE: 35, CodigoTOM: "7109"}, nil
+	case "7201":
+		return &domain.Cidade{CodigoIBGE: 3304557, Nome: "Rio de Janeiro", EstadoCodigoIBGE: 33, CodigoTOM: "7201"}, nil
+	case "7202":
+		return &domain.Cidade{CodigoIBGE: 3301702, Nome: "Niterói", EstadoCodigoIBGE: 33, CodigoTOM: "7202"}, nil
+	case "7301":
+		return &domain.Cidade{CodigoIBGE: 3106200, Nome: "Belo Horizonte", EstadoCodigoIBGE: 31, CodigoTOM: "7301"}, nil
+	default:
+		return nil, fmt.Errorf("cidade com código TOM %s não encontrada", codigo_tom)
 	}
 }
 
@@ -108,7 +181,7 @@ func TestIBGEHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("GET /api/v1/estados/{uf} - deve retornar estado específico", func(t *testing.T) {
+	t.Run("GET /api/v1/estados/{uf} - deve retornar estado específico por sigla", func(t *testing.T) {
 		testCases := []struct {
 			uf           string
 			expectedCode int
@@ -149,6 +222,47 @@ func TestIBGEHandler(t *testing.T) {
 		}
 	})
 
+	t.Run("GET /api/v1/estados/{codigo_ibge} - deve retornar estado específico por código IBGE", func(t *testing.T) {
+		testCases := []struct {
+			codigoIBGE   string
+			expectedCode int
+			expectedName string
+			expectedUF   string
+		}{
+			{"35", http.StatusOK, "São Paulo", "SP"},
+			{"33", http.StatusOK, "Rio de Janeiro", "RJ"},
+			{"31", http.StatusOK, "Minas Gerais", "MG"},
+		}
+
+		for _, tc := range testCases {
+			t.Run("CodigoIBGE_"+tc.codigoIBGE, func(t *testing.T) {
+				req := httptest.NewRequest("GET", "/api/v1/estados/"+tc.codigoIBGE, nil)
+				rr := httptest.NewRecorder()
+
+				router.ServeHTTP(rr, req)
+
+				if status := rr.Code; status != tc.expectedCode {
+					t.Errorf("Status code incorreto para código %s: got %v want %v", tc.codigoIBGE, status, tc.expectedCode)
+				}
+
+				if tc.expectedCode == http.StatusOK {
+					var estado domain.Estado
+					if err := json.Unmarshal(rr.Body.Bytes(), &estado); err != nil {
+						t.Fatalf("Erro ao decodificar JSON: %v", err)
+					}
+
+					if estado.Nome != tc.expectedName {
+						t.Errorf("Nome do estado incorreto: got %v want %v", estado.Nome, tc.expectedName)
+					}
+
+					if estado.Sigla != tc.expectedUF {
+						t.Errorf("Sigla do estado incorreta: got %v want %v", estado.Sigla, tc.expectedUF)
+					}
+				}
+			})
+		}
+	})
+
 	t.Run("GET /api/v1/estados/{uf} - deve retornar 404 para estado inexistente", func(t *testing.T) {
 		invalidUFs := []string{"XX", "YY", "ZZ", "ABC"}
 
@@ -168,8 +282,8 @@ func TestIBGEHandler(t *testing.T) {
 
 	t.Run("GET /api/v1/estados/{uf}/cidades - deve retornar cidades do estado", func(t *testing.T) {
 		testCases := []struct {
-			uf            string
-			expectedCount int
+			uf             string
+			expectedCount  int
 			expectedCities []string
 		}{
 			{"SP", 3, []string{"São Paulo", "Campinas", "Santos"}},
@@ -356,24 +470,5 @@ func TestRateLimiting(t *testing.T) {
 		if i < 5 && rr.Code != http.StatusOK {
 			t.Errorf("Requisição %d deveria passar: got status %d", i, rr.Code)
 		}
-	}
-}
-
-func (m *mockIBGERepository) FindCidadeByCodigo(codigo string) (*domain.Cidade, error) {
-	switch codigo {
-	case "3550308":
-		return &domain.Cidade{CodigoIBGE: 3550308, Nome: "São Paulo", EstadoCodigoIBGE: 35}, nil
-	case "3509502":
-		return &domain.Cidade{CodigoIBGE: 3509502, Nome: "Campinas", EstadoCodigoIBGE: 35}, nil
-	case "3552205":
-		return &domain.Cidade{CodigoIBGE: 3552205, Nome: "Santos", EstadoCodigoIBGE: 35}, nil
-	case "3304557":
-		return &domain.Cidade{CodigoIBGE: 3304557, Nome: "Rio de Janeiro", EstadoCodigoIBGE: 33}, nil
-	case "3301702":
-		return &domain.Cidade{CodigoIBGE: 3301702, Nome: "Niterói", EstadoCodigoIBGE: 33}, nil
-	case "3106200":
-		return &domain.Cidade{CodigoIBGE: 3106200, Nome: "Belo Horizonte", EstadoCodigoIBGE: 31}, nil
-	default:
-		return nil, fmt.Errorf("cidade com código %s não encontrada", codigo)
 	}
 }

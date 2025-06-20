@@ -75,6 +75,40 @@ paths:
       summary: Busca cidade por código IBGE
       tags:
       - Cidades
+  /cidades/{codigo_tom}/tom:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma cidade específica pelo seu código TOM
+      parameters:
+      - description: Código TOM da cidade
+        example: "7107"
+        in: path
+        name: codigo_tom
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Cidade'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Busca cidade por código TOM
+      tags:
+      - Cidades
   /estados:
     get:
       consumes:
@@ -104,7 +138,8 @@ paths:
       - application/json
       description: Retorna os dados completos de um único estado
       parameters:
-      - description: 'Sigla do Estado (ex: SP, RJ, BA)'
+      - description: 'Sigla do Estado (ex: SP, RJ, BA) ou Código IBGE do Estado (ex:
+          35, 33, 29)'
         in: path
         name: uf
         required: true
@@ -132,7 +167,8 @@ paths:
       description: Retorna um array com todas as cidades pertencentes a um determinado
         estado (UF)
       parameters:
-      - description: 'Sigla do Estado (ex: SP, RJ, BA)'
+      - description: 'Sigla do Estado (ex: SP, RJ, BA) ou Código IBGE do Estado (ex:
+          35, 33, 29)'
         in: path
         name: uf
         required: true
