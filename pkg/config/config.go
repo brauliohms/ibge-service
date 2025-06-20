@@ -7,15 +7,15 @@ import (
 )
 
 type Config struct {
-	ServerPort     string
-	ServerHost     string
-	PostgresDSN    string
-	SqliteDSN      string
-	MaxHeaderBytes int
-	AllowedOrigins []string
-	Environment    string
-	LogLevel       string
-	RateLimit      int
+	ServerPort      string
+	ServerHost      string
+	PostgresDSN     string
+	SqliteDSN       string
+	MaxHeaderBytes  int
+	AllowedOrigins  []string
+	Environment     string
+	LogLevel        string
+	RateLimit       int
 	RateLimitWindow string
 }
 

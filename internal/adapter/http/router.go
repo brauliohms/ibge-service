@@ -14,13 +14,13 @@ import (
 
 func SetupRouter(handler *IBGEHandler) http.Handler {
 	r := chi.NewRouter()
-	
+
 	// 1. Carregar configurações
 	cfg := config.Load()
 
 	// Configuração CORS baseada em variáveis de ambiente
 	allowedOrigins := cfg.AllowedOrigins
-	
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: allowedOrigins,
 		AllowedMethods: []string{
@@ -42,7 +42,7 @@ func SetupRouter(handler *IBGEHandler) http.Handler {
 			"X-Total-Count",
 		},
 		AllowCredentials: true,
-		MaxAge: 300, // 5 minutos
+		MaxAge:           300, // 5 minutos
 	}))
 
 	// Middlewares para produção
