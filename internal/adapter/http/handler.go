@@ -32,6 +32,7 @@ func NewIBGEHandler(uc *usecase.IBGEUseCase) *IBGEHandler {
 func (h *IBGEHandler) GetAllEstados(w http.ResponseWriter, r *http.Request) {
 	estados, err := h.useCase.GetAllEstados()
 	if err != nil {
+		log.Printf("Erro ao buscar estados: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Erro interno do servidor")
 		return
 	}
@@ -52,6 +53,7 @@ func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
 	ufOuCodigo := chi.URLParam(r, "uf")
 	var estado *domain.Estado
 	var err error
+	
 	// Verifica se é um número (código IBGE) ou string (sigla)
 	if _, parseErr := strconv.Atoi(ufOuCodigo); parseErr == nil {
 		// É um número, busca por código IBGE
@@ -60,7 +62,9 @@ func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
 		// É uma string, busca por sigla
 		estado, err = h.useCase.GetEstadoByUF(strings.ToUpper(ufOuCodigo))
 	}
+	
 	if err != nil {
+		log.Printf("Erro ao buscar estado %s: %v", ufOuCodigo, err)
 		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
@@ -81,6 +85,7 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 	ufOuCodigo := chi.URLParam(r, "uf")
 	var cidades []domain.Cidade
 	var err error
+	
 	// Verifica se é um número (código IBGE) ou string (sigla)
 	if _, parseErr := strconv.Atoi(ufOuCodigo); parseErr == nil {
 		// É um número, busca por código IBGE
@@ -89,7 +94,9 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 		// É uma string, busca por sigla
 		cidades, err = h.useCase.GetCidadesByEstadoUF(strings.ToUpper(ufOuCodigo))
 	}
+	
 	if err != nil {
+		log.Printf("Erro ao buscar cidades do estado %s: %v", ufOuCodigo, err)
 		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
@@ -108,9 +115,10 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 // @Failure 404 {object} map[string]string
 // @Router /cidades/{codigo_ibge} [get]
 func (h *IBGEHandler) GetCidadeByCodigo(w http.ResponseWriter, r *http.Request) {
-	codigo_ibge := chi.URLParam(r, "codigo_ibge")
-	cidade, err := h.useCase.GetCidadeByCodigo(codigo_ibge)
+	codigoIBGE := chi.URLParam(r, "codigo_ibge")
+	cidade, err := h.useCase.GetCidadeByCodigo(codigoIBGE)
 	if err != nil {
+		log.Printf("Erro ao buscar cidade com código %s: %v", codigoIBGE, err)
 		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
@@ -129,9 +137,10 @@ func (h *IBGEHandler) GetCidadeByCodigo(w http.ResponseWriter, r *http.Request) 
 // @Failure 404 {object} map[string]string
 // @Router /cidades/{codigo_tom}/tom [get]
 func (h *IBGEHandler) GetCidadeByCodigoTOM(w http.ResponseWriter, r *http.Request) {
-	codigo_tom := chi.URLParam(r, "codigo_tom")
-	cidade, err := h.useCase.GetCidadeByCodigoTOM(codigo_tom)
+	codigoTOM := chi.URLParam(r, "codigo_tom")
+	cidade, err := h.useCase.GetCidadeByCodigoTOM(codigoTOM)
 	if err != nil {
+		log.Printf("Erro ao buscar cidade com código TOM %s: %v", codigoTOM, err)
 		respondWithError(w, http.StatusNotFound, err.Error())
 		return
 	}
@@ -150,9 +159,9 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	
-	if _, err := w.Write(response); err != nil {
-		log.Printf("Erro ao escrever resposta HTTP: %v", err)
-	}
+	// Ignoramos o erro de w.Write intencionalmente aqui
+	// pois não há muito que possamos fazer se falhar
+	_, _ = w.Write(response)
 }
 
 // respondWithError é uma função helper para padronizar as respostas de erro.
@@ -168,7 +177,7 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	
-	if _, err := w.Write(response); err != nil {
-		log.Printf("Erro ao escrever resposta de erro HTTP: %v", err)
-	}
+	// Ignoramos o erro de w.Write intencionalmente aqui
+	// pois não há muito que possamos fazer se falhar
+	_, _ = w.Write(response)
 }

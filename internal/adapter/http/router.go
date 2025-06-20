@@ -41,7 +41,7 @@ func SetupRouter(handler *IBGEHandler) http.Handler {
 	// Health check
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		w.Write([]byte("OK")) //nolint:errcheck
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {
