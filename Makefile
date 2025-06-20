@@ -12,6 +12,9 @@ format:
 # Corrigir formatação
 	go fmt ./...
 
+health:
+	curl -f http://localhost:9080/health || exit 1
+	
 run:
 	go run ./cmd/ibge-api/main.go
 

@@ -32,7 +32,10 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	// 1. Carregar configurações
 	cfg := config.Load()
-	log.Println("Configurações carregadas")
+	log.Printf("🚀 Iniciando servidor IBGE Service")
+	log.Printf("📍 Ambiente: %s", cfg.Environment)
+	log.Printf("🌐 Servidor: %s", cfg.GetServerAddress())
+	log.Printf("🔗 CORS Origins: %v", cfg.AllowedOrigins)
 
 	// 2. Inicializar o repositório fonte (PostgreSQL)
 	// Este repositório será usado APENAS para a carga inicial.
@@ -44,14 +47,14 @@ func main() {
 
 	ibgeRepo, err := sqlite.NewSQLiteRepository(cfg.SqliteDSN)
 	if err != nil {
-		log.Fatalf("Falha ao conectar com o SQLite: %v", err)
+		log.Fatalf("❌ Erro ao conectar com o SQLite: %v", err)
 	}
 
 	// 3. Inicializar o repositório em memória, usando o PostgreSQL como fonte.
 	// Esta é a mágica do cache no startup!
 	memoryRepo, err := memory.NewMemoryRepository(ibgeRepo)
 	if err != nil {
-		log.Fatalf("Falha ao carregar dados para o repositório em memória: %v", err)
+		log.Fatalf("❌ Erro ao carregar dados para o repositório em memória: %v", err)
 	}
 	log.Println("Repositório em memória populado com sucesso")
 	// Neste ponto, a conexão com o Postgres poderia até ser fechada se não fosse mais necessária.
@@ -74,9 +77,9 @@ func main() {
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// 7. Iniciar o servidor HTTP.
-	serverAddr := fmt.Sprintf(":%s", cfg.ServerPort)
-	log.Printf("Servidor iniciado e ouvindo em http://localhost%s", serverAddr)
-	if err := http.ListenAndServe(serverAddr, router); err != nil {
-		log.Fatalf("Falha ao iniciar o servidor HTTP: %v", err)
+	log.Printf("✅ Servidor rodando em http://%s", cfg.GetServerAddress())
+	log.Printf("📚 Documentação disponível em http://%s/api/v1/docs/", cfg.GetServerAddress())
+	if err := http.ListenAndServe(cfg.GetServerAddress(), router); err != nil {
+		log.Fatalf("❌ Erro ao iniciar o servidor HTTP: %v", err)
 	}
 }

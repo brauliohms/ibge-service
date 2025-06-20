@@ -4,14 +4,46 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/brauliohms/ibge-service/pkg/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func SetupRouter(handler *IBGEHandler) http.Handler {
 	r := chi.NewRouter()
+	
+	// 1. Carregar configurações
+	cfg := config.Load()
+
+	// Configuração CORS baseada em variáveis de ambiente
+	allowedOrigins := cfg.AllowedOrigins
+	
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: allowedOrigins,
+		AllowedMethods: []string{
+			"GET",
+			"POST",
+			"PUT",
+			"DELETE",
+			"OPTIONS",
+		},
+		AllowedHeaders: []string{
+			"Accept",
+			"Authorization",
+			"Content-Type",
+			"X-CSRF-Token",
+			"X-Requested-With",
+		},
+		ExposedHeaders: []string{
+			"Link",
+			"X-Total-Count",
+		},
+		AllowCredentials: true,
+		MaxAge: 300, // 5 minutos
+	}))
 
 	// Middlewares para produção
 	r.Use(middleware.RequestID)
@@ -36,12 +68,12 @@ func SetupRouter(handler *IBGEHandler) http.Handler {
 	})
 
 	// Rate limiting (opcional - requer biblioteca externa)
-	r.Use(httprate.LimitByIP(100, 1*time.Minute)) // 100 requests por minuto por IP
+	r.Use(httprate.LimitByIP(cfg.RateLimit, 1*time.Minute)) // 100 requests por minuto por IP
 
 	// Health check
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK")) //nolint:errcheck
+		_, _ = w.Write([]byte("OK"))
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {

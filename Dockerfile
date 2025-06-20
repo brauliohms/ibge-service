@@ -21,7 +21,12 @@ COPY --from=builder /app/docs/ /app/docs/
 RUN adduser -D -s /bin/sh appuser && \
     chown -R appuser:appuser /app
 USER appuser
-
+# Configurações de ambiente
+ENV GO_ENV=production
+ENV LOG_LEVEL=warn
+# Configurações de rate limiting
+ENV RATE_LIMIT=50
+ENV RATE_LIMIT_WINDOW=1m
 # Expor a porta que a aplicação usará (deve corresponder à SERVER_PORT)
 EXPOSE 9080
 

@@ -16,3 +16,14 @@
 
 # Go workspace file
 go.work
+
+bin/
+
+# Environment files
+.env.local
+.env.production
+.env.staging
+
+# Mas manter .env e .env.example
+!.env
+!.env.example
