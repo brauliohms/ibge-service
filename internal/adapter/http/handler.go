@@ -53,7 +53,7 @@ func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
 	ufOuCodigo := chi.URLParam(r, "uf")
 	var estado *domain.Estado
 	var err error
-	
+
 	// Verifica se é um número (código IBGE) ou string (sigla)
 	if _, parseErr := strconv.Atoi(ufOuCodigo); parseErr == nil {
 		// É um número, busca por código IBGE
@@ -62,7 +62,7 @@ func (h *IBGEHandler) GetEstadoByUF(w http.ResponseWriter, r *http.Request) {
 		// É uma string, busca por sigla
 		estado, err = h.useCase.GetEstadoByUF(strings.ToUpper(ufOuCodigo))
 	}
-	
+
 	if err != nil {
 		log.Printf("Erro ao buscar estado %s: %v", ufOuCodigo, err)
 		respondWithError(w, http.StatusNotFound, err.Error())
@@ -85,7 +85,7 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 	ufOuCodigo := chi.URLParam(r, "uf")
 	var cidades []domain.Cidade
 	var err error
-	
+
 	// Verifica se é um número (código IBGE) ou string (sigla)
 	if _, parseErr := strconv.Atoi(ufOuCodigo); parseErr == nil {
 		// É um número, busca por código IBGE
@@ -94,7 +94,7 @@ func (h *IBGEHandler) GetCidadesByEstadoUF(w http.ResponseWriter, r *http.Reques
 		// É uma string, busca por sigla
 		cidades, err = h.useCase.GetCidadesByEstadoUF(strings.ToUpper(ufOuCodigo))
 	}
-	
+
 	if err != nil {
 		log.Printf("Erro ao buscar cidades do estado %s: %v", ufOuCodigo, err)
 		respondWithError(w, http.StatusNotFound, err.Error())
@@ -155,10 +155,10 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 		respondWithError(w, http.StatusInternalServerError, "Erro interno do servidor")
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	
+
 	// Ignoramos o erro de w.Write intencionalmente aqui
 	// pois não há muito que possamos fazer se falhar
 	_, _ = w.Write(response)
@@ -173,10 +173,10 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 		http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	
+
 	// Ignoramos o erro de w.Write intencionalmente aqui
 	// pois não há muito que possamos fazer se falhar
 	_, _ = w.Write(response)
